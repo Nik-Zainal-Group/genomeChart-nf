@@ -50,25 +50,25 @@ process PREPARE_DATA {
   ADDITIONAL_FLAGS="-c -p -s -m"
 
   SNV_ARG=""
-  if [ "${snvs_vcf}" != "NO_FILE" ]; then
+  if [ -f "${snvs_vcf}" ]; then
     echo -e "${sample_id}\t${snvs_vcf}" > snvs.txt
     SNV_ARG="${snv_flag} snvs.txt"
   fi
 
   INDEL_ARG=""
-  if [ "${indels_vcf}" != "NO_FILE" ]; then
+  if [ -f "${indels_vcf}" ]; then
     echo -e "${sample_id}\t${indels_vcf}" > indels.txt
     INDEL_ARG="${indel_flag} indels.txt"
   fi
 
   CNV_ARG=""
-  if [ "${cnvs_vcf}" != "NO_FILE" ]; then
+  if [ -f "${cnvs_vcf}" ]; then
     echo -e "${sample_id}\t${cnvs_vcf}" > cnvs.txt
     CNV_ARG="${cnv_flag} cnvs.txt"
   fi
 
   SV_ARG=""
-  if [ "${svs_vcf}" != "NO_FILE" ]; then
+  if [ -f "${svs_vcf}" ]; then
     echo -e "${sample_id}\t${svs_vcf}" > svs.txt
     SV_ARG="${sv_flag} svs.txt"
   fi
@@ -131,10 +131,10 @@ workflow {
     | map { row ->
       tuple(
         row.sampleid,
-        row.snvs?.trim()   ? file("${params.data_rootdir}/${row.snvs.trim()}", checkIfExists: true)   : "NO_FILE",
-        row.indels?.trim() ? file("${params.data_rootdir}/${row.indels.trim()}", checkIfExists: true) : "NO_FILE",
-        row.cnvs?.trim()   ? file("${params.data_rootdir}/${row.cnvs.trim()}", checkIfExists: true)   : "NO_FILE",
-        row.svs?.trim()    ? file("${params.data_rootdir}/${row.svs.trim()}", checkIfExists: true)    : "NO_FILE"
+        row.snvs?.trim()   ? file("${params.data_rootdir}/${row.snvs.trim()}", checkIfExists: true)   : [],
+        row.indels?.trim() ? file("${params.data_rootdir}/${row.indels.trim()}", checkIfExists: true) : [],
+        row.cnvs?.trim()   ? file("${params.data_rootdir}/${row.cnvs.trim()}", checkIfExists: true)   : [],
+        row.svs?.trim()    ? file("${params.data_rootdir}/${row.svs.trim()}", checkIfExists: true)    : []
       )
     }
     |view()
